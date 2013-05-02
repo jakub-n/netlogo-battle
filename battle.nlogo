@@ -1,36 +1,53 @@
+breed [redarmy redsoldier]
+breed [bluearmy bluesoldier]
+
+;; globals [death-prob]
+
+
 turtles-own[
   is-fighting
   ]
 
 to setup
   clear-all
+  set-default-shape turtles "default"
   setArmy
+  ;;set death-prob 30 ;; in %
+  drawChessboard
+  reset-ticks
 end
 
+
+
 to go
+  tick
+  ask turtles [checkneighour]   
+  
   ask turtles with[is-fighting = false][
     move
-    checkneighour   
     ]
 
   ask turtles with [is-fighting = true][ 
       fight
     ]
+  if done? [
+    stop
+  ]
 end
 
 
 
 to setArmy
-  crt 50[
+  create-redarmy army-population [
     set color red
-    set size 1
+    set size 2
     setxy random-xcor random-ycor 
     set is-fighting false
     ]
   
-  crt 50[
+  create-bluearmy army-population [
     set color blue
-    set size 1
+    set size 2
     setxy random-xcor random-ycor 
     set is-fighting false
     ]
@@ -44,25 +61,63 @@ to move
 end
 
 to checkneighour
-   ifelse color = red[ ask turtles-here with [color = blue] [
-        set is-fighting true
-        ]
-    ][ 
-    ask turtles-here with [color = red] [
-        set is-fighting true
-        ] 
-    ]
-end
-
-to fight
+  if any? enemiesInFightingRadius [
+    if not is-fighting [
+       set color color + 3
+       set is-fighting true
+    ] 
+  ]
+  
+    
+  if not any? enemiesInFightingRadius [
+     if is-fighting [    
+       set color color - 3
+       set is-fighting false
+     ]  
+  ]
   
 end
 
+to fight
+  if any? enemiesInFightingRadius [
+    ask one-of enemiesInFightingRadius [
+      if random 100 < death-prob [
+        die
+        show word [color] of myself "won"
+      ]
+    ]
+  ]
+
+end
+
+to-report done?
+  if not any? turtles with [breed = redarmy] [
+    report true
+  ]
+  if not any? turtles with [breed = bluearmy] [
+    report true
+  ]
+  report false
+end
+
+to-report enemiesInFightingRadius
+   report turtles in-radius fight-radius with [breed != [breed] of myself]
+  ;;report turtles in-radius 1 with [breed != [breed] of myself]
+end
+
+to drawChessboard 
+    ask patches [
+      let grey? ((pxcor + pycor) mod 2) = 0
+      if grey? [
+        set pcolor grey - 4
+      ]
+    ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+217
 10
-649
+656
 470
 16
 16
@@ -119,6 +174,124 @@ NIL
 NIL
 NIL
 1
+
+BUTTON
+125
+140
+188
+173
+step
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+131
+596
+331
+746
+fighters counts
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"redarmy" 1.0 0 -2674135 true "" "plot count turtles with [breed = redarmy]"
+"bluearmy" 1.0 0 -13345367 true "" "plot count turtles with [breed = bluearmy]"
+
+SLIDER
+18
+188
+190
+221
+army-population
+army-population
+0
+100
+51
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+25
+246
+197
+279
+fight-radius
+fight-radius
+0.1
+5
+0.5
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+26
+326
+198
+359
+fight-smell
+fight-smell
+fight-radius
+10
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+24
+385
+196
+418
+death-prob
+death-prob
+0
+100
+65
+1
+1
+%
+HORIZONTAL
+
+MONITOR
+491
+607
+548
+652
+reds
+count turtles with [breed = redarmy]
+17
+1
+11
+
+MONITOR
+548
+607
+605
+652
+blues
+count turtles with [breed = bluearmy]
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
