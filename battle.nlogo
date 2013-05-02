@@ -55,9 +55,13 @@ end
 
 
 to move
+  ifelse any? fightingEnemiesInSmellingRadius and random 100 < smell-fight-prob [
+    face one-of fightingEnemiesInSmellingRadius
+  ] [
+    rt random 100
+    lt random 100 
+  ]
  forward 1
- rt random 30
- lt random 30 
 end
 
 to checkneighour
@@ -102,7 +106,10 @@ end
 
 to-report enemiesInFightingRadius
    report turtles in-radius fight-radius with [breed != [breed] of myself]
-  ;;report turtles in-radius 1 with [breed != [breed] of myself]
+end
+
+to-report fightingEnemiesInSmellingRadius
+   report turtles in-radius smell-fight-radius with [breed != [breed] of myself and is-fighting = true]
 end
 
 to drawChessboard 
@@ -193,10 +200,10 @@ NIL
 1
 
 PLOT
-131
-596
-331
-746
+14
+546
+214
+696
 fighters counts
 NIL
 NIL
@@ -244,13 +251,13 @@ HORIZONTAL
 SLIDER
 26
 326
-198
+208
 359
-fight-smell
-fight-smell
-fight-radius
+smell-fight-radius
+smell-fight-radius
+0
 10
-4
+10
 1
 1
 NIL
@@ -265,17 +272,17 @@ death-prob
 death-prob
 0
 100
-65
+8
 1
 1
 %
 HORIZONTAL
 
 MONITOR
-491
-607
-548
-652
+13
+501
+70
+546
 reds
 count turtles with [breed = redarmy]
 17
@@ -283,15 +290,69 @@ count turtles with [breed = redarmy]
 11
 
 MONITOR
-548
-607
-605
-652
+70
+501
+127
+546
 blues
 count turtles with [breed = bluearmy]
 17
 1
 11
+
+MONITOR
+260
+502
+384
+547
+currently fighting
+count turtles with [is-fighting = true]
+17
+1
+11
+
+SLIDER
+26
+293
+208
+326
+smell-fight-prob
+smell-fight-prob
+0
+100
+0
+1
+1
+%
+HORIZONTAL
+
+PLOT
+261
+548
+461
+698
+currently fighting
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles with [is-fighting = true]"
+
+TEXTBOX
+686
+60
+1009
+315
+army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se musi bojovnici priblizit, aby nehoko zabili\n\ndeath-prob = pravdepodobnost, ze bojovnik zabije druheho v jednom kole\n\nsmell-fight-prob = pst, s jakou jde nebojujici bojovnik za bojujicim nepritelem\n\nsmell-fight-radius = polomer, v jakem bojovnik citi boj
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
