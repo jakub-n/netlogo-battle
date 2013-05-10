@@ -1,3 +1,5 @@
+__includes["a.nls" "b.nls"]
+
 breed [redarmy redsoldier]
 breed [bluearmy bluesoldier]
 
@@ -272,7 +274,7 @@ death-prob
 death-prob
 0
 100
-8
+1
 1
 1
 %
@@ -320,7 +322,7 @@ smell-fight-prob
 smell-fight-prob
 0
 100
-0
+49
 1
 1
 %
@@ -701,6 +703,15 @@ NetLogo 5.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="2" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <steppedValueSet variable="smell-fight-prob" first="0" step="20" last="100"/>
+    <steppedValueSet variable="smell-fight-radius" first="0" step="1" last="5"/>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
