@@ -1,4 +1,4 @@
-__includes["a.nls" "b.nls"]
+;;__includes["a.nls" "b.nls"]
 
 breed [redarmy redsoldier]
 breed [bluearmy bluesoldier]
