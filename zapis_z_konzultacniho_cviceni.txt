@@ -1,0 +1,7 @@
+* turnaj stragegii je vhodny
+* dezerce a ucinnost utoku nejsou vhodne parametry do turnaje, protoze velmi pravdepodobne bude jejich vliv monotonni (spise az linearni)
+* pro stanoveni vhodnych hodnot do turnaje je mozne je od oka tipnou - vybrat ty, kde se model choval zajimave
+* konzultovane a schvalene parametry jsou: citeni boje, shlukovani se svym tymem, inicialni prostorove rozmisteni
+* je nutne mit nejaky realny vzor modelovane reality - je nutne rozhodnou, zda se jedna o bitvu namorno, sdredovekou bitvu pesaku, ... (ocekavam, ze jsou to ti pesaci)
+* pohled na prubeh bitvy by aspon trochu mel pripominat realitu
+* inicialni nahodne, promisene rozlozeni je nesmyslne
