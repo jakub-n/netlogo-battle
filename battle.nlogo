@@ -12,7 +12,8 @@ turtles-own[
 
 to setup
   clear-all
-  set-default-shape turtles "default"
+  ;;set-default-shape turtles "default"
+  set-default-shape turtles "person"
   setArmy
   ;;set death-prob 30 ;; in %
   drawChessboard
@@ -39,18 +40,105 @@ end
 
 
 
-to setArmy
+to setArmy  
   create-redarmy army-population [
     set color red
     set size 2
-    setxy random-xcor random-ycor 
+    
+    ;; Testing only
+    if red_position = "random" [
+      setxy random-xcor random-ycor
+      ]
+    
+    if red_position = "corner" [
+      let position_x min-pxcor + 1
+      let position_y max-pycor - 1
+      
+      setxy position_x position_y
+       
+       while[count turtles-here > 1][
+         set position_y position_y - 2
+         
+         if position_y <= 0 [
+          set position_y max-pycor - 1
+          set position_x position_x + 2 
+           ]
+         
+         setxy position_x position_y
+         ]
+      
+       set heading 150         
+      ]
+    
+    if red_position = "side" [
+      let position_x min-pxcor + 1
+      let position_y max-pycor / 2
+      
+      setxy position_x position_y
+       
+       while[count turtles-here > 1][
+         set position_y position_y - 2
+         
+         if position_y <= min-pycor / 2 [
+          set position_y max-pycor / 2
+          set position_x position_x + 2 
+           ]
+         
+         setxy position_x position_y
+         ]
+       set heading 90         
+    ]
+
     set is-fighting false
     ]
   
   create-bluearmy army-population [
     set color blue
     set size 2
-    setxy random-xcor random-ycor 
+    
+     ;; Testing only
+    if blue_position = "random" [
+      setxy random-xcor random-ycor
+      ]
+    
+    if blue_position = "corner" [
+      let position_x max-pxcor - 1
+      let position_y min-pycor + 1
+      
+      setxy position_x position_y
+       
+       while[count turtles-here > 1][
+         set position_y position_y + 2
+         
+         if position_y >= 0 [
+          set position_y min-pycor + 1
+          set position_x position_x - 2 
+           ]
+         
+         setxy position_x position_y
+         ]
+       set heading 300      
+      ]
+    
+    if blue_position = "side" [
+      let position_x max-pxcor - 1
+      let position_y max-pycor / 2
+      
+      setxy position_x position_y
+       
+       while[count turtles-here > 1][
+         set position_y position_y - 2
+         
+         if position_y <= min-pycor / 2 [
+          set position_y max-pycor / 2
+          set position_x position_x - 2 
+           ]
+         
+         setxy position_x position_y
+         ]
+        set heading 270          
+    ]
+     
     set is-fighting false
     ]
 end
@@ -60,8 +148,8 @@ to move
   ifelse any? fightingEnemiesInSmellingRadius and random 100 < smell-fight-prob [
     face one-of fightingEnemiesInSmellingRadius
   ] [
-    rt random 100
-    lt random 100 
+    rt random 15
+    lt random 15 
   ]
  forward 1
 end
@@ -126,10 +214,10 @@ end
 GRAPHICS-WINDOW
 217
 10
-656
-470
-16
-16
+760
+574
+20
+20
 13.0
 1
 10
@@ -140,10 +228,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+-20
+20
+-20
+20
 0
 0
 1
@@ -229,7 +317,7 @@ army-population
 army-population
 0
 100
-51
+80
 1
 1
 NIL
@@ -244,7 +332,7 @@ fight-radius
 fight-radius
 0.1
 5
-0.5
+2.2
 0.1
 1
 NIL
@@ -355,6 +443,26 @@ army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se m
 12
 0.0
 1
+
+CHOOSER
+837
+360
+975
+405
+red_position
+red_position
+"corner" "side" "random"
+0
+
+CHOOSER
+801
+434
+939
+479
+blue_position
+blue_position
+"random" "side" "corner"
+2
 
 @#$#@#$#@
 ## WHAT IS IT?

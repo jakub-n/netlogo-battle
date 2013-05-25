@@ -5,3 +5,21 @@
 * je nutne mit nejaky realny vzor modelovane reality - je nutne rozhodnou, zda se jedna o bitvu namorno, sdredovekou bitvu pesaku, ... (ocekavam, ze jsou to ti pesaci)
 * pohled na prubeh bitvy by aspon trochu mel pripominat realitu
 * inicialni nahodne, promisene rozlozeni je nesmyslne
+* 
+*
+*Jednotlive ukoly:
+*1) Vytvoøit strategie:
+*   - "Cítìní boje" OK
+*   - Shlukování se svým týmem
+*   - Poèáteèní prostorové rozmístìní
+*   
+*2) Udìlat model hezší na pohled  - dìláme bitvu pøeších armád
+*   - nahradit šipky za "human" (pro DEBUG se to zatím hodí)
+*   - zmìnit podklad na nìjaký pøipomínající bojové pole - jednobarevné? (pro DEBUG se to zatím hodí) 
+*   - Zvýšit rádium tak aby se jednotky neshlukovali na sobì
+*   - Jak udìlat hezèí vizuální odlišení bojujících bojovníkù?
+*   
+*3) Smysluplné hodnoty parametrù strategií
+*
+*4) Turnaj strategií a vytvoøení výstupù
+
