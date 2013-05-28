@@ -3,7 +3,8 @@
 breed [redarmy redsoldier]
 breed [bluearmy bluesoldier]
 
-;; globals [death-prob]
+globals [stepLength]
+
 
 
 turtles-own[
@@ -12,9 +13,11 @@ turtles-own[
 
 to setup
   clear-all
+  setGlobals
   ;;set-default-shape turtles "default"
   set-default-shape turtles "person"
   setArmy
+  ask turtles [ set size turtle-icon-size]
   ;;set death-prob 30 ;; in %
   drawChessboard
   reset-ticks
@@ -38,12 +41,13 @@ to go
   ]
 end
 
-
+to setGlobals
+  set stepLength 1
+end
 
 to setArmy  
   create-redarmy army-population [
     set color red
-    set size 2
     
     ;; Testing only
     if red_position = "random" [
@@ -94,7 +98,6 @@ to setArmy
   
   create-bluearmy army-population [
     set color blue
-    set size 2
     
      ;; Testing only
     if blue_position = "random" [
@@ -145,13 +148,107 @@ end
 
 
 to move
-  ifelse any? fightingEnemiesInSmellingRadius and random 100 < smell-fight-prob [
-    face one-of fightingEnemiesInSmellingRadius
-  ] [
-    rt random 15
-    lt random 15 
+  let originalXPosition xcor
+  let originalYPosition ycor
+  let originalDirection heading
+  
+  let counter 0
+  let positionFound? false
+  while [counter < 3 and not positionFound? ] [
+    setNewPosition
+    let positionValid? validateCurrentPosition
+    if positionValid? [
+      set positionFound? true
+    ]
   ]
- forward 1
+  
+  if not positionFound? [
+    set xcor originalXPosition
+    set ycor originalYPosition
+    set heading originalDirection
+    show (word "Turtle " who " could not find proper position.")
+  ]
+  
+  
+  ;;ifelse any? fightingEnemiesInSmellingRadius and random 100 < smell-fight-prob [
+  ;;  face one-of fightingEnemiesInSmellingRadius
+  ;;] [
+  ;;  rt random 15
+  ;;  lt random 15 
+  ;;]
+ ;;forward 1
+end
+
+to setNewPosition
+  let positionSet? false
+  set positionSet? setPositionByFightIfAny
+  if not positionSet? [set positionSet? setPositionByVisibleEnemyIfAny]
+  if not positionSet? [set positionSet? setPositionByComeradesIfAny]
+  if not positionSet? [setPositionRandomly]
+end
+
+;; it returns true if there is no solder in radius "person-radius"
+to-report validateCurrentPosition
+  report not any? other turtles in-radius person-radius
+end
+
+;; return true if position was set; false otherwise
+to-report setPositionByFightIfAny
+  if any? enemiesInFightingRadius [
+    let nearestEnemy min-one-of enemiesInFightingRadius [distance myself]
+    face nearestEnemy
+    applyHeadingDeviation
+    forward 1
+    report true
+  ]
+  report false
+end
+
+;; return true if position was set; false otherwise
+to-report setPositionByVisibleEnemyIfAny
+  if any? visibleEnemies [
+    let nearestEnemy min-one-of visibleEnemies [distance myself]
+    face nearestEnemy
+    applyHeadingDeviation
+    forward 1
+    report true
+  ]
+  report false
+end
+
+;; return true if position was set; false otherwise
+to-report setPositionByComeradesIfAny
+  let groupingComrades comeradesInGroupingDistance
+  if any? groupingComrades [
+    faceAgeragePointOf groupingComrades
+    applyHeadingDeviation
+    forward 1
+    report true
+  ]
+  report false;
+end
+
+to setPositionRandomly 
+  rt random 60
+  lt random 60 
+  forward stepLength
+end
+
+to faceAgeragePointOf [turtleSet]
+  let sumX 0
+  let sumY 0
+  ask turtleSet [
+    set sumX (sumX + xcor)
+    set sumY (sumY + ycor)
+  ]
+  let x (sumX / count turtleSet)
+  let y (sumY / count turtleSet)
+  faceXY x y
+end
+
+to applyHeadingDeviation
+  rt random 30
+  lt random 30
 end
 
 to checkneighour
@@ -194,6 +291,14 @@ to-report done?
   report false
 end
 
+to-report comeradesInGroupingDistance 
+   report turtles in-cone view-radius 180 with [breed = [breed] of myself]
+end
+
+to-report visibleEnemies 
+   report turtles in-radius view-radius with [breed != [breed] of myself]
+end
+
 to-report enemiesInFightingRadius
    report turtles in-radius fight-radius with [breed != [breed] of myself]
 end
@@ -204,9 +309,12 @@ end
 
 to drawChessboard 
     ask patches [
-      let grey? ((pxcor + pycor) mod 2) = 0
-      if grey? [
-        set pcolor grey - 4
+      
+      let lightShade? ((pxcor + pycor) mod 2) = 0
+      ifelse lightShade? [
+        set pcolor background_color + 0.5
+      ] [
+        set pcolor background_color
       ]
     ]
 end
@@ -239,10 +347,10 @@ ticks
 30.0
 
 BUTTON
-56
-98
-120
-131
+6
+17
+70
+50
 Setup
 setup
 NIL
@@ -256,10 +364,10 @@ NIL
 1
 
 BUTTON
-128
-98
-191
-131
+78
+17
+141
+50
 Go
 go
 T
@@ -273,10 +381,10 @@ NIL
 1
 
 BUTTON
-125
-140
-188
-173
+75
+59
+138
+92
 step
 go
 NIL
@@ -309,10 +417,10 @@ PENS
 "bluearmy" 1.0 0 -13345367 true "" "plot count turtles with [breed = bluearmy]"
 
 SLIDER
-18
-188
-190
-221
+4
+132
+176
+165
 army-population
 army-population
 0
@@ -324,10 +432,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-25
-246
-197
-279
+4
+169
+176
+202
 fight-radius
 fight-radius
 0.1
@@ -339,25 +447,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-26
-326
-208
-359
+983
+384
+1165
+417
 smell-fight-radius
 smell-fight-radius
 0
 10
-10
+9
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-24
-385
-196
-418
+5
+206
+177
+239
 death-prob
 death-prob
 0
@@ -402,10 +510,10 @@ count turtles with [is-fighting = true]
 11
 
 SLIDER
-26
-293
-208
-326
+983
+351
+1165
+384
 smell-fight-prob
 smell-fight-prob
 0
@@ -435,10 +543,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count turtles with [is-fighting = true]"
 
 TEXTBOX
-686
-60
-1009
-315
+776
+33
+1087
+214
 army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se musi bojovnici priblizit, aby nehoko zabili\n\ndeath-prob = pravdepodobnost, ze bojovnik zabije druheho v jednom kole\n\nsmell-fight-prob = pst, s jakou jde nebojujici bojovnik za bojujicim nepritelem\n\nsmell-fight-radius = polomer, v jakem bojovnik citi boj
 12
 0.0
@@ -447,12 +555,12 @@ army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se m
 CHOOSER
 837
 360
-975
+967
 405
 red_position
 red_position
 "corner" "side" "random"
-0
+2
 
 CHOOSER
 801
@@ -463,6 +571,92 @@ blue_position
 blue_position
 "random" "side" "corner"
 2
+
+INPUTBOX
+1105
+56
+1260
+116
+background_color
+61
+1
+0
+Color
+
+SLIDER
+1105
+118
+1277
+151
+turtle-icon-size
+turtle-icon-size
+0
+5
+0.9
+0.1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+1106
+31
+1256
+49
+visual settings
+11
+0.0
+0
+
+TEXTBOX
+23
+103
+173
+121
+global settings
+11
+0.0
+1
+
+TEXTBOX
+783
+246
+933
+264
+per team settings
+11
+0.0
+1
+
+SLIDER
+5
+243
+177
+276
+person-radius
+person-radius
+0
+1
+0.4
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+5
+280
+177
+313
+view-radius
+view-radius
+0
+10
+5
+.5
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -818,6 +1012,38 @@ NetLogo 5.0.4
     <metric>count turtles</metric>
     <steppedValueSet variable="smell-fight-prob" first="0" step="20" last="100"/>
     <steppedValueSet variable="smell-fight-radius" first="0" step="1" last="5"/>
+  </experiment>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="smell-fight-prob">
+      <value value="49"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="red_position">
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="death-prob">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="army-population">
+      <value value="80"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="turtle_size">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="smell-fight-radius">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fight-radius">
+      <value value="2.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="background_color">
+      <value value="61"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="blue_position">
+      <value value="&quot;corner&quot;"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
