@@ -3,11 +3,7 @@
 breed [redarmy redsoldier]
 breed [bluearmy bluesoldier]
 
-globals [
-  stepLength 
-  armydistance
-  ]
-
+globals [stepLength]
 
 
 
@@ -54,7 +50,6 @@ end
 
 to setGlobals
   set stepLength 1
-  set armydistance 1
 end
 
 to cleanFootprints 
@@ -87,18 +82,23 @@ to setArmy
   create-redarmy army-population [
     set color red
     
+    ;; Testing only
+    if red_position = "random" [
+      setxy random-xcor random-ycor
+      ]
+    
     if red_position = "corner" [
-      let position_x min-pxcor + armydistance
-      let position_y max-pycor - armydistance
+      let position_x min-pxcor + 1
+      let position_y max-pycor - 1
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - turtle-icon-size
+         set position_y position_y - 2
          
          if position_y <= 0 [
-          set position_y max-pycor - armydistance
-          set position_x position_x + turtle-icon-size 
+          set position_y max-pycor - 1
+          set position_x position_x + 2 
            ]
          
          setxy position_x position_y
@@ -108,17 +108,17 @@ to setArmy
       ]
     
     if red_position = "side" [
-      let position_x min-pxcor
+      let position_x min-pxcor + 1
       let position_y max-pycor / 2
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - turtle-icon-size
+         set position_y position_y - 2
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x + turtle-icon-size
+          set position_x position_x + 2 
            ]
          
          setxy position_x position_y
@@ -132,18 +132,23 @@ to setArmy
   create-bluearmy army-population [
     set color blue
     
+     ;; Testing only
+    if blue_position = "random" [
+      setxy random-xcor random-ycor
+      ]
+    
     if blue_position = "corner" [
-      let position_x max-pxcor - armydistance
-      let position_y min-pycor + armydistance
+      let position_x max-pxcor - 1
+      let position_y min-pycor + 1
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y + turtle-icon-size
+         set position_y position_y + 2
          
          if position_y >= 0 [
-          set position_y min-pycor + armydistance
-          set position_x position_x - turtle-icon-size
+          set position_y min-pycor + 1
+          set position_x position_x - 2 
            ]
          
          setxy position_x position_y
@@ -152,17 +157,17 @@ to setArmy
       ]
     
     if blue_position = "side" [
-      let position_x max-pxcor
+      let position_x max-pxcor - 1
       let position_y max-pycor / 2
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - turtle-icon-size
+         set position_y position_y - 2
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x - turtle-icon-size 
+          set position_x position_x - 2 
            ]
          
          setxy position_x position_y
@@ -179,6 +184,7 @@ to move
   let originalXPosition xcor
   let originalYPosition ycor
   let originalDirection heading
+  let originalPatch patch-here
   
   let counter 0
   let positionFound? false
@@ -198,6 +204,11 @@ to move
     show (word "Turtle " who " could not find proper position.")
   ] [
     enlargeFootprint
+  ]
+  
+  if patch-here = originalPatch [
+    rt 180
+    applyHeadingDeviation
   ]
 end
 
@@ -220,6 +231,7 @@ to setNewPosition
 end
 
 to-report selectTurningStrategy
+  if who = 37 [ show word "groupingAvailable? " groupingAvailable? ]
   let weightList (list (smell-fight-weight * smellFightAvailable?) (enemy-vision-weight * enemyVisionAvailable?) (grouping-weight * groupingAvailable?) random-weight)
   let randomNumber random (sum weightList)
   let selectedTurningStrategyIndex 0
@@ -277,6 +289,7 @@ end
 
 ;; it returns boolean encoded as int (0~false 1~true)
 to-report groupingAvailable?
+  if who = 37 [show word "neighbourFootprintedPatches: " neighbourFootprintedPatches]
   report ifelse-value any? neighbourFootprintedPatches [1] [0]
 end
 
@@ -350,7 +363,10 @@ to-report done?
   report false
 end
 
-to-report neighbourFootprintedPatches 
+to-report neighbourFootprintedPatches
+  if not any? other turtles in-cone (stepLength + 2) 80 with [breed = [breed] of myself] [
+    report no-patches
+  ]
   let sniffThreshold 0.4
   let footprintedPatchesAhead patches in-cone stepLength 80 with [footprint > sniffThreshold]
   report footprintedPatchesAhead
@@ -420,9 +436,9 @@ ticks
 
 BUTTON
 6
-10
+17
 70
-43
+50
 Setup
 setup
 NIL
@@ -437,9 +453,9 @@ NIL
 
 BUTTON
 78
-10
+17
 141
-43
+50
 Go
 go
 T
@@ -453,10 +469,10 @@ NIL
 1
 
 BUTTON
-148
-10
-211
-43
+75
+59
+138
+92
 step
 go
 NIL
@@ -470,10 +486,10 @@ NIL
 1
 
 PLOT
-12
-534
-207
-684
+14
+546
+214
+696
 fighters counts
 NIL
 NIL
@@ -489,70 +505,70 @@ PENS
 "bluearmy" 1.0 0 -13345367 true "" "plot count turtles with [breed = bluearmy]"
 
 SLIDER
-7
-68
-209
-101
+4
+132
+176
+165
 army-population
 army-population
 0
 100
-44
+73
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-108
-209
-141
+4
+169
+176
+202
 fight-radius
 fight-radius
 0.1
 5
-1.5
+2.2
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-781
+934
+284
+1116
 317
-935
-350
 smell-fight-radius-red
 smell-fight-radius-red
 0
 10
-8
+9
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-148
-208
-181
+5
+206
+177
+239
 death-prob
 death-prob
 0
 100
-5
+8
 1
 1
 %
 HORIZONTAL
 
 MONITOR
-12
-478
-69
-523
+13
+501
+70
+546
 reds
 count turtles with [breed = redarmy]
 17
@@ -561,9 +577,9 @@ count turtles with [breed = redarmy]
 
 MONITOR
 70
-478
+501
 127
-523
+546
 blues
 count turtles with [breed = bluearmy]
 17
@@ -571,10 +587,10 @@ count turtles with [breed = bluearmy]
 11
 
 MONITOR
-131
-478
-207
-523
+260
+502
+384
+547
 currently fighting
 count turtles with [is-fighting = true]
 17
@@ -582,10 +598,10 @@ count turtles with [is-fighting = true]
 11
 
 PLOT
-770
-532
-970
-682
+261
+548
+461
+698
 currently fighting
 NIL
 NIL
@@ -611,29 +627,29 @@ army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se m
 
 CHOOSER
 780
-267
-872
-312
+282
+910
+327
 red_position
 red_position
-"corner" "side"
+"corner" "side" "random"
 0
 
 CHOOSER
-988
-267
-1080
-312
+779
+327
+917
+372
 blue_position
 blue_position
-"side" "corner"
-1
+"random" "side" "corner"
+2
 
 INPUTBOX
-782
-390
-880
-450
+1105
+56
+1260
+116
 background_color
 61
 1
@@ -641,55 +657,55 @@ background_color
 Color
 
 SLIDER
-991
-389
-1090
-422
+1105
+118
+1277
+151
 turtle-icon-size
 turtle-icon-size
-1
-3
-1
-1
+0
+5
+0.9
+0.1
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-783
-365
-933
-383
+1106
+31
+1256
+49
 visual settings
 11
 0.0
 0
 
 TEXTBOX
-9
-51
-159
-69
-Global settings
+23
+103
+173
+121
+global settings
 11
 0.0
 1
 
 TEXTBOX
 783
-248
+246
 933
-266
-Red army settings
+264
+per team settings
 11
 0.0
 1
 
 SLIDER
-8
-188
-208
-221
+5
+243
+177
+276
 person-radius
 person-radius
 0
@@ -701,10 +717,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-227
-208
-260
+5
+280
+177
+313
 view-radius
 view-radius
 0
@@ -716,10 +732,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-290
-207
-323
+6
+368
+178
+401
 smell-fight-weight
 smell-fight-weight
 0
@@ -731,35 +747,35 @@ smell-fight-weight
 HORIZONTAL
 
 TEXTBOX
-10
-271
-160
-289
-Direction decision components
+14
+348
+164
+366
+direction decision components
 11
 0.0
 1
 
 SLIDER
-9
-330
-207
-363
+6
+402
+186
+435
 enemy-vision-weight
 enemy-vision-weight
 0
 100
-0
+2
 1
 1
 %
 HORIZONTAL
 
 SLIDER
-10
-372
-207
-405
+7
+434
+179
+467
 grouping-weight
 grouping-weight
 0
@@ -771,10 +787,10 @@ grouping-weight
 HORIZONTAL
 
 SLIDER
-11
-414
-207
-447
+7
+467
+179
+500
 random-weight
 random-weight
 1
@@ -786,10 +802,10 @@ random-weight
 HORIZONTAL
 
 SWITCH
-886
-390
-985
-423
+1112
+162
+1261
+195
 show-footprints?
 show-footprints?
 0
@@ -797,10 +813,10 @@ show-footprints?
 -1000
 
 SLIDER
-989
-318
-1143
-351
+937
+329
+1109
+362
 smell-fight-radius-blue
 smell-fight-radius-blue
 0
@@ -810,26 +826,6 @@ smell-fight-radius-blue
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-992
-247
-1142
-265
-Blue army settings
-11
-0.0
-1
-
-TEXTBOX
-14
-457
-164
-475
-Statistics
-11
-0.0
-1
 
 @#$#@#$#@
 ## WHAT IS IT?
