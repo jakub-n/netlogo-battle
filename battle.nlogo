@@ -3,7 +3,12 @@
 breed [redarmy redsoldier]
 breed [bluearmy bluesoldier]
 
-globals [stepLength]
+globals [
+  stepLength 
+  turtlesize
+  armydistance
+  ]
+
 
 
 
@@ -50,6 +55,8 @@ end
 
 to setGlobals
   set stepLength 1
+  set turtlesize 1
+  set armydistance 1
 end
 
 to cleanFootprints 
@@ -88,17 +95,17 @@ to setArmy
       ]
     
     if red_position = "corner" [
-      let position_x min-pxcor + 1
-      let position_y max-pycor - 1
+      let position_x min-pxcor + turtlesize
+      let position_y max-pycor - turtlesize
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - 2
+         set position_y position_y - armydistance
          
          if position_y <= 0 [
-          set position_y max-pycor - 1
-          set position_x position_x + 2 
+          set position_y max-pycor - turtlesize
+          set position_x position_x + armydistance 
            ]
          
          setxy position_x position_y
@@ -108,17 +115,17 @@ to setArmy
       ]
     
     if red_position = "side" [
-      let position_x min-pxcor + 1
+      let position_x min-pxcor + turtlesize
       let position_y max-pycor / 2
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - 2
+         set position_y position_y - armydistance
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x + 2 
+          set position_x position_x + armydistance 
            ]
          
          setxy position_x position_y
@@ -138,17 +145,17 @@ to setArmy
       ]
     
     if blue_position = "corner" [
-      let position_x max-pxcor - 1
-      let position_y min-pycor + 1
+      let position_x max-pxcor - turtlesize
+      let position_y min-pycor + turtlesize
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y + 2
+         set position_y position_y + armydistance
          
          if position_y >= 0 [
-          set position_y min-pycor + 1
-          set position_x position_x - 2 
+          set position_y min-pycor + turtlesize
+          set position_x position_x - armydistance 
            ]
          
          setxy position_x position_y
@@ -157,17 +164,17 @@ to setArmy
       ]
     
     if blue_position = "side" [
-      let position_x max-pxcor - 1
+      let position_x max-pxcor - turtlesize
       let position_y max-pycor / 2
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - 2
+         set position_y position_y - armydistance
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x - 2 
+          set position_x position_x - armydistance 
            ]
          
          setxy position_x position_y
@@ -502,7 +509,7 @@ army-population
 army-population
 0
 100
-73
+44
 1
 1
 NIL
@@ -622,7 +629,7 @@ CHOOSER
 red_position
 red_position
 "corner" "side" "random"
-0
+1
 
 CHOOSER
 779
@@ -632,7 +639,7 @@ CHOOSER
 blue_position
 blue_position
 "random" "side" "corner"
-2
+1
 
 INPUTBOX
 1105
