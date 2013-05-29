@@ -11,15 +11,20 @@ turtles-own[
   is-fighting
   ]
 
+patches-own [
+  footprint
+]
+
 to setup
   clear-all
   setGlobals
-  ;;set-default-shape turtles "default"
-  set-default-shape turtles "person"
+  set-default-shape turtles "default"
+  ;;set-default-shape turtles "person"
   setArmy
   ask turtles [ set size turtle-icon-size]
   ;;set death-prob 30 ;; in %
   drawChessboard
+  cleanFootprints
   reset-ticks
 end
 
@@ -27,8 +32,10 @@ end
 
 to go
   tick
-  ask turtles [checkneighour]   
-  
+  ask turtles [checkneighour]
+  spreadFootprints   
+  decreaseFootprints
+  drawFootprints
   ask turtles with[is-fighting = false][
     move
     ]
@@ -43,6 +50,32 @@ end
 
 to setGlobals
   set stepLength 1
+end
+
+to cleanFootprints 
+  ask patches [
+    set footprint 0
+  ]
+end
+
+to drawFootprints 
+  ask patches [
+    ifelse footprint > 0.05 and show-footprints? [
+      set pcolor orange - 4.5 + footprint * 2
+    ] [
+      fillWithOriginalColor
+    ]
+  ]
+end
+
+to decreaseFootprints 
+  ask patches [
+    set footprint footprint * 0.9
+  ]
+end
+
+to spreadFootprints
+    diffuse footprint 0.5
 end
 
 to setArmy  
@@ -160,31 +193,59 @@ to move
     if positionValid? [
       set positionFound? true
     ]
+    set counter counter + 1
   ]
   
-  if not positionFound? [
+  ifelse not positionFound? [
     set xcor originalXPosition
     set ycor originalYPosition
     set heading originalDirection
     show (word "Turtle " who " could not find proper position.")
+  ] [
+    enlargeFootprint
   ]
-  
-  
-  ;;ifelse any? fightingEnemiesInSmellingRadius and random 100 < smell-fight-prob [
-  ;;  face one-of fightingEnemiesInSmellingRadius
-  ;;] [
-  ;;  rt random 15
-  ;;  lt random 15 
-  ;;]
- ;;forward 1
+end
+
+to enlargeFootprint
+  ask patch-here [
+      set footprint 1
+    ]
 end
 
 to setNewPosition
-  let positionSet? false
-  set positionSet? setPositionByFightIfAny
-  if not positionSet? [set positionSet? setPositionByVisibleEnemyIfAny]
-  if not positionSet? [set positionSet? setPositionByComeradesIfAny]
-  if not positionSet? [setPositionRandomly]
+  let turningStrategyIndex selectTurningStrategy
+  
+  ;; TODO delete
+  ;;show word "setNewPosition turningStrategyIndex " turningStrategyIndex
+  
+  if turningStrategyIndex = 1 [setPositionByFight]
+  if turningStrategyIndex = 2 [setPositionByVisibleEnemy]
+  if turningStrategyIndex = 3 [setPositionByFootprints]
+  if turningStrategyIndex = 4 [setPositionRandomly]
+end
+
+to-report selectTurningStrategy
+  let weightList (list (smell-fight-weight * smellFightAvailable?) (enemy-vision-weight * enemyVisionAvailable?) (grouping-weight * groupingAvailable?) random-weight)
+  let randomNumber random (sum weightList)
+  let selectedTurningStrategyIndex 0
+  
+  ;; TODO delete
+  ;;show (word "sum weightList: " (sum weightList) " random number " randomNumber)
+  
+  let counter 1
+  while [selectedTurningStrategyIndex = 0] [
+    if (counter > 4) [
+      show (word "steering selection cycle counter overrun; random number: " randomNumber " list: " weightList)
+    ]
+    let weightSum sum (sublist weightList 0 counter)
+    show (word "in while " counter " sum " weightSum " random number " randomNumber " sublist " (sublist weightList 0 counter))
+    if randomNumber < weightSum [
+      set selectedTurningStrategyIndex counter
+      ;;show word "set selectedTurningStrategyIndex " counter
+    ]
+    set counter (counter + 1)
+  ]
+  report selectedTurningStrategyIndex
 end
 
 ;; it returns true if there is no solder in radius "person-radius"
@@ -192,45 +253,48 @@ to-report validateCurrentPosition
   report not any? other turtles in-radius person-radius
 end
 
-;; return true if position was set; false otherwise
-to-report setPositionByFightIfAny
-  if any? enemiesInFightingRadius [
-    let nearestEnemy min-one-of enemiesInFightingRadius [distance myself]
-    face nearestEnemy
-    applyHeadingDeviation
-    forward 1
-    report true
-  ]
-  report false
+;; it returns boolean encoded as int (0~false 1~true)
+to-report smellFightAvailable?
+  ;;show word "smellFightAvailable " (any? enemiesInFightingRadius)
+  report ifelse-value (any? fightingEnemiesInSmellingRadius) [1] [0]
 end
 
 ;; return true if position was set; false otherwise
-to-report setPositionByVisibleEnemyIfAny
-  if any? visibleEnemies [
+to setPositionByFight
+    let nearestEnemy min-one-of fightingEnemiesInSmellingRadius [distance myself]
+    face nearestEnemy
+    applyHeadingDeviation
+    forward stepLength
+end
+
+;; it returns boolean encoded as int (0~false 1~true)
+to-report enemyVisionAvailable?
+  report ifelse-value any? visibleEnemies [1] [0]
+end
+
+;; return true if position was set; false otherwise
+to setPositionByVisibleEnemy
     let nearestEnemy min-one-of visibleEnemies [distance myself]
     face nearestEnemy
     applyHeadingDeviation
-    forward 1
-    report true
-  ]
-  report false
+    forward stepLength
 end
 
-;; return true if position was set; false otherwise
-to-report setPositionByComeradesIfAny
-  let groupingComrades comeradesInGroupingDistance
-  if any? groupingComrades [
-    faceAgeragePointOf groupingComrades
-    applyHeadingDeviation
-    forward 1
-    report true
-  ]
-  report false;
+;; it returns boolean encoded as int (0~false 1~true)
+to-report groupingAvailable?
+  report ifelse-value any? neighbourFootprintedPatches [1] [0]
+end
+
+to setPositionByFootprints
+  let footprintedPatches neighbourFootprintedPatches
+  let mostFootprintedPatch max-one-of footprintedPatches [footprint]
+  facexy ([pxcor] of mostFootprintedPatch) ([pycor] of mostFootprintedPatch)
+  forward stepLength
 end
 
 to setPositionRandomly 
-  rt random 60
-  lt random 60 
+  rt random 140
+  lt random 140 
   forward stepLength
 end
 
@@ -247,8 +311,8 @@ to faceAgeragePointOf [turtleSet]
 end
 
 to applyHeadingDeviation
-  rt random 30
-  lt random 30
+  rt random 40
+  lt random 40
 end
 
 to checkneighour
@@ -274,7 +338,7 @@ to fight
     ask one-of enemiesInFightingRadius [
       if random 100 < death-prob [
         die
-        show word [color] of myself "won"
+        ;;show word [color] of myself "won"
       ]
     ]
   ]
@@ -291,8 +355,10 @@ to-report done?
   report false
 end
 
-to-report comeradesInGroupingDistance 
-   report turtles in-cone view-radius 180 with [breed = [breed] of myself]
+to-report neighbourFootprintedPatches 
+  let sniffThreshold 0.4
+  let footprintedPatchesAhead patches in-cone stepLength 80 with [footprint > sniffThreshold]
+  report footprintedPatchesAhead
 end
 
 to-report visibleEnemies 
@@ -304,19 +370,30 @@ to-report enemiesInFightingRadius
 end
 
 to-report fightingEnemiesInSmellingRadius
-   report turtles in-radius smell-fight-radius with [breed != [breed] of myself and is-fighting = true]
+   report turtles in-radius getSmellFightRadiusByBreed with [breed != [breed] of myself and is-fighting = true]
+end
+
+to-report getSmellFightRadiusByBreed
+  ifelse breed = redarmy [
+      report smell-fight-radius-red
+    ] [
+      report smell-fight-radius-blue
+    ]
 end
 
 to drawChessboard 
     ask patches [
-      
+      fillWithOriginalColor
+    ]
+end
+
+to fillWithOriginalColor
       let lightShade? ((pxcor + pycor) mod 2) = 0
       ifelse lightShade? [
         set pcolor background_color + 0.5
       ] [
         set pcolor background_color
       ]
-    ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -333,8 +410,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 -20
 20
@@ -425,7 +502,7 @@ army-population
 army-population
 0
 100
-80
+73
 1
 1
 NIL
@@ -447,12 +524,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-983
-384
-1165
-417
-smell-fight-radius
-smell-fight-radius
+934
+284
+1116
+317
+smell-fight-radius-red
+smell-fight-radius-red
 0
 10
 9
@@ -470,7 +547,7 @@ death-prob
 death-prob
 0
 100
-1
+5
 1
 1
 %
@@ -509,21 +586,6 @@ count turtles with [is-fighting = true]
 1
 11
 
-SLIDER
-983
-351
-1165
-384
-smell-fight-prob
-smell-fight-prob
-0
-100
-49
-1
-1
-%
-HORIZONTAL
-
 PLOT
 261
 548
@@ -553,20 +615,20 @@ army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se m
 1
 
 CHOOSER
-837
-360
-967
-405
+780
+282
+910
+327
 red_position
 red_position
 "corner" "side" "random"
-2
+0
 
 CHOOSER
-801
-434
-939
-479
+779
+327
+917
+372
 blue_position
 blue_position
 "random" "side" "corner"
@@ -637,7 +699,7 @@ person-radius
 person-radius
 0
 1
-0.4
+1
 0.1
 1
 NIL
@@ -651,9 +713,105 @@ SLIDER
 view-radius
 view-radius
 0
+20
+20
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+6
+368
+178
+401
+smell-fight-weight
+smell-fight-weight
+0
+100
+0
+1
+1
+%
+HORIZONTAL
+
+TEXTBOX
+14
+348
+164
+366
+direction decision components
+11
+0.0
+1
+
+SLIDER
+6
+402
+186
+435
+enemy-vision-weight
+enemy-vision-weight
+0
+100
+0
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+7
+434
+179
+467
+grouping-weight
+grouping-weight
+0
+100
+100
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+7
+467
+179
+500
+random-weight
+random-weight
+1
+100
+1
+1
+1
+%
+HORIZONTAL
+
+SWITCH
+1112
+162
+1261
+195
+show-footprints?
+show-footprints?
+0
+1
+-1000
+
+SLIDER
+937
+329
+1109
+362
+smell-fight-radius-blue
+smell-fight-radius-blue
+0
 10
-5
-.5
+9
+1
 1
 NIL
 HORIZONTAL
