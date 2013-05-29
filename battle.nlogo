@@ -420,9 +420,9 @@ ticks
 
 BUTTON
 6
-17
+10
 70
-50
+43
 Setup
 setup
 NIL
@@ -437,9 +437,9 @@ NIL
 
 BUTTON
 78
-17
+10
 141
-50
+43
 Go
 go
 T
@@ -453,10 +453,10 @@ NIL
 1
 
 BUTTON
-75
-59
-138
-92
+148
+10
+211
+43
 step
 go
 NIL
@@ -470,10 +470,10 @@ NIL
 1
 
 PLOT
-14
-546
-214
-696
+12
+534
+207
+684
 fighters counts
 NIL
 NIL
@@ -489,10 +489,10 @@ PENS
 "bluearmy" 1.0 0 -13345367 true "" "plot count turtles with [breed = bluearmy]"
 
 SLIDER
-4
-132
-176
-165
+7
+68
+209
+101
 army-population
 army-population
 0
@@ -504,10 +504,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-169
-176
-202
+7
+108
+209
+141
 fight-radius
 fight-radius
 0.1
@@ -519,25 +519,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-934
-284
-1116
+781
 317
+935
+350
 smell-fight-radius-red
 smell-fight-radius-red
 0
 10
-9
+8
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-206
-177
-239
+7
+148
+208
+181
 death-prob
 death-prob
 0
@@ -549,10 +549,10 @@ death-prob
 HORIZONTAL
 
 MONITOR
-13
-501
-70
-546
+12
+478
+69
+523
 reds
 count turtles with [breed = redarmy]
 17
@@ -561,9 +561,9 @@ count turtles with [breed = redarmy]
 
 MONITOR
 70
-501
+478
 127
-546
+523
 blues
 count turtles with [breed = bluearmy]
 17
@@ -571,10 +571,10 @@ count turtles with [breed = bluearmy]
 11
 
 MONITOR
-260
-502
-384
-547
+131
+478
+207
+523
 currently fighting
 count turtles with [is-fighting = true]
 17
@@ -582,10 +582,10 @@ count turtles with [is-fighting = true]
 11
 
 PLOT
-261
-548
-461
-698
+770
+532
+970
+682
 currently fighting
 NIL
 NIL
@@ -611,29 +611,29 @@ army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se m
 
 CHOOSER
 780
-282
-910
-327
+267
+872
+312
 red_position
 red_position
 "corner" "side"
 0
 
 CHOOSER
-779
-327
-917
-372
+988
+267
+1080
+312
 blue_position
 blue_position
 "side" "corner"
 1
 
 INPUTBOX
-1105
-56
-1260
-116
+782
+390
+880
+450
 background_color
 61
 1
@@ -641,10 +641,10 @@ background_color
 Color
 
 SLIDER
-1105
-118
-1277
-151
+991
+389
+1090
+422
 turtle-icon-size
 turtle-icon-size
 1
@@ -656,40 +656,40 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-1106
-31
-1256
-49
+783
+365
+933
+383
 visual settings
 11
 0.0
 0
 
 TEXTBOX
-23
-103
-173
-121
-global settings
+9
+51
+159
+69
+Global settings
 11
 0.0
 1
 
 TEXTBOX
 783
-246
+248
 933
-264
-per team settings
+266
+Red army settings
 11
 0.0
 1
 
 SLIDER
-5
-243
-177
-276
+8
+188
+208
+221
 person-radius
 person-radius
 0
@@ -701,10 +701,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-280
-177
-313
+7
+227
+208
+260
 view-radius
 view-radius
 0
@@ -716,10 +716,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-368
-178
-401
+8
+290
+207
+323
 smell-fight-weight
 smell-fight-weight
 0
@@ -731,20 +731,20 @@ smell-fight-weight
 HORIZONTAL
 
 TEXTBOX
-14
-348
-164
-366
-direction decision components
+10
+271
+160
+289
+Direction decision components
 11
 0.0
 1
 
 SLIDER
-6
-402
-186
-435
+9
+330
+207
+363
 enemy-vision-weight
 enemy-vision-weight
 0
@@ -756,10 +756,10 @@ enemy-vision-weight
 HORIZONTAL
 
 SLIDER
-7
-434
-179
-467
+10
+372
+207
+405
 grouping-weight
 grouping-weight
 0
@@ -771,10 +771,10 @@ grouping-weight
 HORIZONTAL
 
 SLIDER
-7
-467
-179
-500
+11
+414
+207
+447
 random-weight
 random-weight
 1
@@ -786,10 +786,10 @@ random-weight
 HORIZONTAL
 
 SWITCH
-1112
-162
-1261
-195
+886
+390
+985
+423
 show-footprints?
 show-footprints?
 0
@@ -797,10 +797,10 @@ show-footprints?
 -1000
 
 SLIDER
-937
-329
-1109
-362
+989
+318
+1143
+351
 smell-fight-radius-blue
 smell-fight-radius-blue
 0
@@ -810,6 +810,26 @@ smell-fight-radius-blue
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+992
+247
+1142
+265
+Blue army settings
+11
+0.0
+1
+
+TEXTBOX
+14
+457
+164
+475
+Statistics
+11
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
