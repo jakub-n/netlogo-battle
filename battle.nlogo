@@ -5,7 +5,6 @@ breed [bluearmy bluesoldier]
 
 globals [
   stepLength 
-  turtlesize
   armydistance
   ]
 
@@ -55,7 +54,6 @@ end
 
 to setGlobals
   set stepLength 1
-  set turtlesize 1
   set armydistance 1
 end
 
@@ -89,23 +87,18 @@ to setArmy
   create-redarmy army-population [
     set color red
     
-    ;; Testing only
-    if red_position = "random" [
-      setxy random-xcor random-ycor
-      ]
-    
     if red_position = "corner" [
-      let position_x min-pxcor + turtlesize
-      let position_y max-pycor - turtlesize
+      let position_x min-pxcor + armydistance
+      let position_y max-pycor - armydistance
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - armydistance
+         set position_y position_y - turtle-icon-size
          
          if position_y <= 0 [
-          set position_y max-pycor - turtlesize
-          set position_x position_x + armydistance 
+          set position_y max-pycor - armydistance
+          set position_x position_x + turtle-icon-size 
            ]
          
          setxy position_x position_y
@@ -115,17 +108,17 @@ to setArmy
       ]
     
     if red_position = "side" [
-      let position_x min-pxcor + turtlesize
+      let position_x min-pxcor
       let position_y max-pycor / 2
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - armydistance
+         set position_y position_y - turtle-icon-size
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x + armydistance 
+          set position_x position_x + turtle-icon-size
            ]
          
          setxy position_x position_y
@@ -139,23 +132,18 @@ to setArmy
   create-bluearmy army-population [
     set color blue
     
-     ;; Testing only
-    if blue_position = "random" [
-      setxy random-xcor random-ycor
-      ]
-    
     if blue_position = "corner" [
-      let position_x max-pxcor - turtlesize
-      let position_y min-pycor + turtlesize
+      let position_x max-pxcor - armydistance
+      let position_y min-pycor + armydistance
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y + armydistance
+         set position_y position_y + turtle-icon-size
          
          if position_y >= 0 [
-          set position_y min-pycor + turtlesize
-          set position_x position_x - armydistance 
+          set position_y min-pycor + armydistance
+          set position_x position_x - turtle-icon-size
            ]
          
          setxy position_x position_y
@@ -164,17 +152,17 @@ to setArmy
       ]
     
     if blue_position = "side" [
-      let position_x max-pxcor - turtlesize
+      let position_x max-pxcor
       let position_y max-pycor / 2
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - armydistance
+         set position_y position_y - turtle-icon-size
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x - armydistance 
+          set position_x position_x - turtle-icon-size 
            ]
          
          setxy position_x position_y
@@ -524,7 +512,7 @@ fight-radius
 fight-radius
 0.1
 5
-2.2
+1.5
 0.1
 1
 NIL
@@ -628,8 +616,8 @@ CHOOSER
 327
 red_position
 red_position
-"corner" "side" "random"
-1
+"corner" "side"
+0
 
 CHOOSER
 779
@@ -638,7 +626,7 @@ CHOOSER
 372
 blue_position
 blue_position
-"random" "side" "corner"
+"side" "corner"
 1
 
 INPUTBOX
@@ -659,10 +647,10 @@ SLIDER
 151
 turtle-icon-size
 turtle-icon-size
-0
-5
-0.9
-0.1
+1
+3
+1
+1
 1
 NIL
 HORIZONTAL
