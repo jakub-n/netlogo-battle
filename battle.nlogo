@@ -15,8 +15,8 @@ turtles-own[
 to setup
   clear-all
   setGlobals
-  ;;set-default-shape turtles "default"
-  set-default-shape turtles "person"
+  set-default-shape turtles "default"
+  ;;set-default-shape turtles "person"
   setArmy
   ask turtles [ set size turtle-icon-size]
   ;;set death-prob 30 ;; in %
@@ -47,6 +47,12 @@ end
 to setArmy  
   create-redarmy army-population [
     set color red
+    
+     if red_position = "random" [
+       
+        setxy (random (max-pxcor) - max-pxcor) (random (max-pycor * 2) - max-pycor)
+        set heading 90
+     ]
     
     if red_position = "corner" [
       let position_x min-pxcor + armyMargin
@@ -92,6 +98,12 @@ to setArmy
   
   create-bluearmy army-population [
     set color blue
+    
+      if red_position = "random" [
+       
+        setxy (random (max-pxcor)) (random (max-pycor * 2) - max-pycor)
+        set heading 270
+     ]
     
     if blue_position = "corner" [
       let position_x max-pxcor - armyMargin
@@ -224,7 +236,7 @@ to setNewPosition
 end
 
 to-report selectTurningStrategy
-  let weightList (list (enemy-vision-weight * enemyVisionAvailable?) (grouping-weight * groupingAvailable?) random-weight)
+  let weightList (list (enemy-vision-weight * enemyVisionAvailable?) (getGroupingWeight * groupingAvailable?) random-weight)
   let randomNumber random (sum weightList)
   let selectedTurningStrategyIndex 0
   
@@ -245,6 +257,16 @@ to-report selectTurningStrategy
     set counter (counter + 1)
   ]
   report selectedTurningStrategyIndex
+end
+
+to-report getGroupingWeight
+ ifelse breed = redarmy 
+ [
+   report grouping_weight_red
+   ] 
+ [
+   report grouping_weight_blue
+   ]
 end
 
 ;; it returns true if there is no solder in radius "person-radius"
@@ -606,7 +628,7 @@ CHOOSER
 red_position
 red_position
 "corner" "side" "random"
-0
+2
 
 CHOOSER
 988
@@ -616,7 +638,7 @@ CHOOSER
 blue_position
 blue_position
 "corner" "side" "random"
-0
+2
 
 INPUTBOX
 1222
@@ -723,22 +745,7 @@ enemy-vision-weight
 enemy-vision-weight
 0
 100
-0
 1
-1
-%
-HORIZONTAL
-
-SLIDER
-10
-372
-207
-405
-grouping-weight
-grouping-weight
-0
-100
-0
 1
 1
 %
@@ -753,7 +760,7 @@ random-weight
 random-weight
 1
 100
-100
+1
 1
 1
 %
@@ -780,10 +787,10 @@ Statistics
 1
 
 SLIDER
-1009
-515
-1181
-548
+9
+367
+181
+400
 grouping-factor
 grouping-factor
 0
@@ -803,7 +810,7 @@ turning_range_red
 turning_range_red
 0
 360
-20
+140
 10
 1
 NIL
@@ -818,7 +825,7 @@ turning_range_blue
 turning_range_blue
 0
 360
-360
+140
 10
 1
 NIL
@@ -833,7 +840,7 @@ grouping_weight_red
 grouping_weight_red
 0
 100
-51
+100
 1
 1
 %
@@ -848,7 +855,7 @@ grouping_weight_blue
 grouping_weight_blue
 0
 100
-50
+100
 1
 1
 %
@@ -1063,7 +1070,7 @@ false
 Polygon -7500403 true true 150 15 15 120 60 285 240 285 285 120
 
 person
-true
+false
 0
 Circle -7500403 true true 110 5 80
 Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
