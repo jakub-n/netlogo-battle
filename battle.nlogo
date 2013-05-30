@@ -5,38 +5,28 @@ breed [bluearmy bluesoldier]
 
 globals [
   stepLength 
-  armydistance
+  armyMargin
   ]
 
 turtles-own[
   is-fighting
   ]
 
-patches-own [
-  footprint
-]
-
 to setup
   clear-all
   setGlobals
-  set-default-shape turtles "default"
-  ;;set-default-shape turtles "person"
+  ;;set-default-shape turtles "default"
+  set-default-shape turtles "person"
   setArmy
   ask turtles [ set size turtle-icon-size]
   ;;set death-prob 30 ;; in %
   drawChessboard
-  cleanFootprints
   reset-ticks
 end
-
-
 
 to go
   tick
   ask turtles [checkneighour]
-  spreadFootprints   
-  decreaseFootprints
-  drawFootprints
   ask turtles with[is-fighting = false][
     move
     ]
@@ -51,33 +41,7 @@ end
 
 to setGlobals
   set stepLength 1
-  set armydistance 1
-end
-
-to cleanFootprints 
-  ask patches [
-    set footprint 0
-  ]
-end
-
-to drawFootprints 
-  ask patches [
-    ifelse footprint > 0.05 and show-footprints? [
-      set pcolor orange - 4.5 + footprint * 2
-    ] [
-      fillWithOriginalColor
-    ]
-  ]
-end
-
-to decreaseFootprints 
-  ask patches [
-    set footprint footprint * decreaseFootprint
-  ]
-end
-
-to spreadFootprints
-    diffuse footprint 0.2
+  set armyMargin 1
 end
 
 to setArmy  
@@ -85,18 +49,18 @@ to setArmy
     set color red
     
     if red_position = "corner" [
-      let position_x min-pxcor + armydistance
-      let position_y max-pycor - armydistance
+      let position_x min-pxcor + armyMargin
+      let position_y max-pycor - armyMargin
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - turtle-icon-size
+         set position_y position_y - person-radius
          
          if position_y <= 0 [
-          set position_y max-pycor - armydistance
-          set position_x position_x + turtle-icon-size 
-           ]
+          set position_y max-pycor - armyMargin
+          set position_x position_x + person-radius 
+          ]
          
          setxy position_x position_y
          ]
@@ -111,11 +75,11 @@ to setArmy
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - turtle-icon-size
+         set position_y position_y - person-radius
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x + turtle-icon-size
+          set position_x position_x + person-radius
            ]
          
          setxy position_x position_y
@@ -130,17 +94,17 @@ to setArmy
     set color blue
     
     if blue_position = "corner" [
-      let position_x max-pxcor - armydistance
-      let position_y min-pycor + armydistance
+      let position_x max-pxcor - armyMargin
+      let position_y min-pycor + armyMargin
       
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y + turtle-icon-size
+         set position_y position_y + person-radius
          
          if position_y >= 0 [
-          set position_y min-pycor + armydistance
-          set position_x position_x - turtle-icon-size
+          set position_y min-pycor + armyMargin
+          set position_x position_x - person-radius
            ]
          
          setxy position_x position_y
@@ -155,11 +119,11 @@ to setArmy
       setxy position_x position_y
        
        while[count turtles-here > 1][
-         set position_y position_y - turtle-icon-size
+         set position_y position_y - person-radius
          
          if position_y <= min-pycor / 2 [
           set position_y max-pycor / 2
-          set position_x position_x - turtle-icon-size 
+          set position_x position_x - person-radius 
            ]
          
          setxy position_x position_y
@@ -171,14 +135,69 @@ to setArmy
     ]
 end
 
-
 to move
   let originalXPosition xcor
   let originalYPosition ycor
   let originalDirection heading
   let originalPatch patch-here
+  let positionFound? false
   
-  let counter 0
+  let borderId getBorderIndex
+  ifelse borderId != 0 
+  [
+    if borderId = 1 [set heading 180]
+    if borderId = 2 [set heading 270]
+    if borderId = 3 [set heading 0]
+    if borderId = 4 [set heading 90]
+    fd 1
+    set originalDirection heading
+    set positionFound? validateCurrentPosition
+    ]
+  [
+    set positionFound? standardMove
+    ]
+  
+   if not positionFound? [
+    set xcor originalXPosition
+    set ycor originalYPosition
+    set heading originalDirection
+    show (word "Turtle " who " could not find proper position.")
+  ]
+  
+end  
+
+to-report getBorderIndex
+  let borderWidth 0.1
+  let topBorder max-pycor - borderWidth
+  let bottomBorder min-pycor + borderWidth
+  let rightBorder max-pxcor - borderWidth
+  let leftBorder min-pxcor + borderWidth
+  show (word "top left bottom right borders: " topBorder rightBorder bottomBorder leftBorder)
+  if [pycor] of patch-here >= topBorder
+  [
+    report 1
+    ]
+  
+   if [pxcor] of patch-here >= rightBorder 
+  [
+    report 2
+    ]
+  
+   if [pycor] of patch-here <= bottomBorder
+  [
+    report 3
+    ]
+  
+   if [pxcor] of patch-here <= leftBorder
+  [
+    report 4
+    ]  
+  report 0  
+end  
+    
+  
+to-report standardMove
+let counter 0
   let positionFound? false
   while [counter < 3 and not positionFound? ] [
     setNewPosition
@@ -187,28 +206,11 @@ to move
       set positionFound? true
     ]
     set counter counter + 1
-  ]
-  
-  ifelse not positionFound? [
-    set xcor originalXPosition
-    set ycor originalYPosition
-    set heading originalDirection
-    show (word "Turtle " who " could not find proper position.")
-  ] [
-    enlargeFootprint
-  ]
-  
-  if patch-here = originalPatch [
-    rt 180
-    applyHeadingDeviation
-  ]
+  ] 
+  report positionFound?
 end
 
-to enlargeFootprint
-  ask patch-here [
-      set footprint 1
-    ]
-end
+
 
 to setNewPosition
   let turningStrategyIndex selectTurningStrategy
@@ -247,7 +249,8 @@ end
 
 ;; it returns true if there is no solder in radius "person-radius"
 to-report validateCurrentPosition
-  report not any? other turtles in-radius person-radius
+  report not any? other turtles in-radius person-radius 
+  
 end
 
 ;; it returns boolean encoded as int (0~false 1~true)
@@ -290,9 +293,21 @@ to-report sumAngle [a b]
 end
 
 to setPositionRandomly 
-  rt random 140
-  lt random 140 
+  rt random getTurningHalfRange
+  lt random getTurningHalfRange 
   forward stepLength
+end
+
+to-report getTurningHalfRange
+ let range 0
+ ifelse breed = redarmy 
+ [
+   set range turning_range_red
+   ] 
+ [
+   set range turning_range_blue
+   ]
+ report range / 2
 end
 
 to faceAgeragePointOf [turtleSet]
@@ -381,10 +396,10 @@ to fillWithOriginalColor
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-217
-10
-760
-574
+218
+12
+761
+576
 20
 20
 13.0
@@ -486,7 +501,7 @@ army-population
 army-population
 0
 400
-36
+101
 1
 1
 NIL
@@ -501,7 +516,7 @@ fight-radius
 fight-radius
 1.0
 3
-1.2
+1.4
 0.2
 1
 NIL
@@ -604,21 +619,21 @@ blue_position
 0
 
 INPUTBOX
-782
-390
-880
-450
+1222
+57
+1320
+117
 background_color
-61
+51
 1
 0
 Color
 
 SLIDER
-991
-389
-1090
-422
+1326
+57
+1425
+90
 turtle-icon-size
 turtle-icon-size
 1
@@ -630,10 +645,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-783
-365
-933
-383
+1223
+32
+1373
+50
 visual settings
 11
 0.0
@@ -668,7 +683,7 @@ person-radius
 person-radius
 0
 1
-0.4
+1
 0.1
 1
 NIL
@@ -708,7 +723,7 @@ enemy-vision-weight
 enemy-vision-weight
 0
 100
-31
+0
 1
 1
 %
@@ -723,7 +738,7 @@ grouping-weight
 grouping-weight
 0
 100
-100
+0
 1
 1
 %
@@ -738,22 +753,11 @@ random-weight
 random-weight
 1
 100
-1
+100
 1
 1
 %
 HORIZONTAL
-
-SWITCH
-886
-390
-985
-423
-show-footprints?
-show-footprints?
-1
-1
--1000
 
 TEXTBOX
 992
@@ -776,21 +780,6 @@ Statistics
 1
 
 SLIDER
-9
-289
-206
-322
-decreaseFootprint
-decreaseFootprint
-0
-1.0
-0.9
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
 1009
 515
 1181
@@ -799,10 +788,70 @@ grouping-factor
 grouping-factor
 0
 1
-0.7
+0.2
 0.1
 1
 NIL
+HORIZONTAL
+
+SLIDER
+780
+319
+922
+352
+turning_range_red
+turning_range_red
+0
+360
+20
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+989
+319
+1147
+352
+turning_range_blue
+turning_range_blue
+0
+360
+360
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+780
+358
+936
+391
+grouping_weight_red
+grouping_weight_red
+0
+100
+51
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+990
+357
+1148
+390
+grouping_weight_blue
+grouping_weight_blue
+0
+100
+50
+1
+1
+%
 HORIZONTAL
 
 @#$#@#$#@
@@ -1014,7 +1063,7 @@ false
 Polygon -7500403 true true 150 15 15 120 60 285 240 285 285 120
 
 person
-false
+true
 0
 Circle -7500403 true true 110 5 80
 Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
