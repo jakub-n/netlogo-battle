@@ -173,7 +173,7 @@ to move
     set xcor originalXPosition
     set ycor originalYPosition
     set heading originalDirection
-    show (word "Turtle " who " could not find proper position.")
+    ;;show (word "Turtle " who " could not find proper position.")
   ]
   
 end  
@@ -184,7 +184,7 @@ to-report getBorderIndex
   let bottomBorder min-pycor + borderWidth
   let rightBorder max-pxcor - borderWidth
   let leftBorder min-pxcor + borderWidth
-  show (word "top left bottom right borders: " topBorder rightBorder bottomBorder leftBorder)
+  ;;show (word "top left bottom right borders: " topBorder rightBorder bottomBorder leftBorder)
   if [pycor] of patch-here >= topBorder
   [
     report 1
@@ -249,7 +249,7 @@ to-report selectTurningStrategy
       show (word "turning selection cycle counter overrun; random number: " randomNumber " list: " weightList)
     ]
     let weightSum sum (sublist weightList 0 counter)
-    show (word "in while " counter " sum " weightSum " random number " randomNumber " sublist " (sublist weightList 0 counter))
+    ;;show (word "in while " counter " sum " weightSum " random number " randomNumber " sublist " (sublist weightList 0 counter))
     if randomNumber < weightSum [
       set selectedTurningStrategyIndex counter
       ;;show word "set selectedTurningStrategyIndex " counter
@@ -418,10 +418,10 @@ to fillWithOriginalColor
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-218
-12
-761
-576
+422
+11
+965
+575
 20
 20
 13.0
@@ -496,10 +496,10 @@ NIL
 1
 
 PLOT
-12
-534
-207
-684
+11
+296
+206
+446
 fighters counts
 NIL
 NIL
@@ -515,25 +515,25 @@ PENS
 "bluearmy" 1.0 0 -13345367 true "" "plot count turtles with [breed = bluearmy]"
 
 SLIDER
-7
-68
-209
-101
+994
+40
+1196
+73
 army-population
 army-population
-0
-400
-101
-1
+20
+100
+70
+10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-108
-209
-141
+994
+80
+1196
+113
 fight-radius
 fight-radius
 1.0
@@ -545,10 +545,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-148
-208
-181
+994
+120
+1195
+153
 death-prob
 death-prob
 0
@@ -560,10 +560,10 @@ death-prob
 HORIZONTAL
 
 MONITOR
-12
-478
-69
-523
+11
+240
+68
+285
 reds
 count turtles with [breed = redarmy]
 17
@@ -571,10 +571,10 @@ count turtles with [breed = redarmy]
 11
 
 MONITOR
-70
-478
-127
-523
+69
+240
+126
+285
 blues
 count turtles with [breed = bluearmy]
 17
@@ -582,10 +582,10 @@ count turtles with [breed = bluearmy]
 11
 
 MONITOR
-131
-478
-207
-523
+130
+240
+206
+285
 currently fighting
 count turtles with [is-fighting = true]
 17
@@ -593,10 +593,10 @@ count turtles with [is-fighting = true]
 11
 
 PLOT
-770
-532
-970
-682
+207
+296
+407
+446
 currently fighting
 NIL
 NIL
@@ -610,35 +610,25 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot count turtles with [is-fighting = true]"
 
-TEXTBOX
-776
-33
-1087
-214
-army-population = pocet bojovniku jedne strany\n\nfight-radius = jak blizko se musi bojovnici priblizit, aby nehoko zabili\n\ndeath-prob = pravdepodobnost, ze bojovnik zabije druheho v jednom kole\n\nsmell-fight-prob = pst, s jakou jde nebojujici bojovnik za bojujicim nepritelem\n\nsmell-fight-radius = polomer, v jakem bojovnik citi boj
-12
-0.0
-1
-
 CHOOSER
-780
-267
-872
-312
+9
+72
+101
+117
 red_position
 red_position
 "corner" "side" "random"
-2
+0
 
 CHOOSER
-988
-267
-1080
-312
+217
+72
+309
+117
 blue_position
 blue_position
 "corner" "side" "random"
-2
+0
 
 INPUTBOX
 1222
@@ -677,30 +667,30 @@ visual settings
 0
 
 TEXTBOX
-9
-51
-159
-69
+996
+23
+1146
+41
 Global settings
 11
 0.0
 1
 
 TEXTBOX
-783
-248
-933
-266
+15
+53
+165
+71
 Red army settings
 11
 0.0
 1
 
 SLIDER
-8
-188
-208
-221
+995
+160
+1195
+193
 person-radius
 person-radius
 0
@@ -712,10 +702,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-227
-208
-260
+994
+199
+1195
+232
 view-radius
 view-radius
 0
@@ -726,71 +716,61 @@ view-radius
 NIL
 HORIZONTAL
 
-TEXTBOX
-10
-271
-160
-289
-Direction decision components
-11
-0.0
-1
-
 SLIDER
-9
-330
-207
-363
+994
+239
+1196
+272
 enemy-vision-weight
 enemy-vision-weight
 0
 100
-1
+55
 1
 1
 %
 HORIZONTAL
 
 SLIDER
-11
-414
-207
-447
+996
+276
+1197
+309
 random-weight
 random-weight
 1
 100
-1
+55
 1
 1
 %
 HORIZONTAL
 
 TEXTBOX
-992
-247
-1142
-265
+221
+52
+371
+70
 Blue army settings
 11
 0.0
 1
 
 TEXTBOX
-14
-457
-164
-475
+13
+219
+163
+237
 Statistics
 11
 0.0
 1
 
 SLIDER
-9
-367
-181
-400
+996
+314
+1198
+347
 grouping-factor
 grouping-factor
 0
@@ -802,60 +782,60 @@ NIL
 HORIZONTAL
 
 SLIDER
-780
-319
-922
-352
+9
+124
+151
+157
 turning_range_red
 turning_range_red
 0
 360
-140
+120
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-989
-319
-1147
-352
+218
+124
+376
+157
 turning_range_blue
 turning_range_blue
 0
 360
-140
+240
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-780
-358
-936
-391
+9
+163
+165
+196
 grouping_weight_red
 grouping_weight_red
 0
 100
-100
+0
 1
 1
 %
 HORIZONTAL
 
 SLIDER
-990
-357
-1148
-390
+219
+162
+377
+195
 grouping_weight_blue
 grouping_weight_blue
 0
 100
-100
+0
 1
 1
 %
@@ -1209,43 +1189,70 @@ NetLogo 5.0.4
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="2" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count turtles</metric>
-    <steppedValueSet variable="smell-fight-prob" first="0" step="20" last="100"/>
-    <steppedValueSet variable="smell-fight-radius" first="0" step="1" last="5"/>
-  </experiment>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <metric>count turtles</metric>
-    <enumeratedValueSet variable="smell-fight-prob">
-      <value value="49"/>
+    <metric>count turtles with [breed = redarmy]</metric>
+    <metric>count turtles with [breed = bluearmy]</metric>
+    <enumeratedValueSet variable="random-weight">
+      <value value="55"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="red_position">
+      <value value="&quot;corner&quot;"/>
       <value value="&quot;random&quot;"/>
+      <value value="&quot;side&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grouping_weight_blue">
+      <value value="0"/>
+      <value value="50"/>
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="turning_range_red">
+      <value value="120"/>
+      <value value="240"/>
+      <value value="360"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="death-prob">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="person-radius">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="army-population">
-      <value value="80"/>
+    <enumeratedValueSet variable="view-radius">
+      <value value="20"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="turtle_size">
-      <value value="0.9"/>
+    <enumeratedValueSet variable="grouping_weight_red">
+      <value value="0"/>
+      <value value="50"/>
+      <value value="100"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="smell-fight-radius">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="fight-radius">
-      <value value="2.2"/>
+    <enumeratedValueSet variable="turning_range_blue">
+      <value value="120"/>
+      <value value="240"/>
+      <value value="360"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="background_color">
-      <value value="61"/>
+      <value value="51"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enemy-vision-weight">
+      <value value="55"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="army-population">
+      <value value="70"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="grouping-factor">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="turtle-icon-size">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fight-radius">
+      <value value="1.4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="blue_position">
       <value value="&quot;corner&quot;"/>
+      <value value="&quot;random&quot;"/>
+      <value value="&quot;side&quot;"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
