@@ -72,12 +72,12 @@ end
 
 to decreaseFootprints 
   ask patches [
-    set footprint footprint * 0.9
+    set footprint footprint * decreaseFootprint
   ]
 end
 
 to spreadFootprints
-    diffuse footprint 0.5
+    diffuse footprint 0.2
 end
 
 to setArmy  
@@ -216,14 +216,13 @@ to setNewPosition
   ;; TODO delete
   ;;show word "setNewPosition turningStrategyIndex " turningStrategyIndex
   
-  if turningStrategyIndex = 1 [setPositionByFight]
-  if turningStrategyIndex = 2 [setPositionByVisibleEnemy]
-  if turningStrategyIndex = 3 [setPositionByFootprints]
-  if turningStrategyIndex = 4 [setPositionRandomly]
+  if turningStrategyIndex = 1 [setPositionByVisibleEnemy]
+  if turningStrategyIndex = 2 [setPositionByFootprints]
+  if turningStrategyIndex = 3 [setPositionRandomly]
 end
 
 to-report selectTurningStrategy
-  let weightList (list (smell-fight-weight * smellFightAvailable?) (enemy-vision-weight * enemyVisionAvailable?) (grouping-weight * groupingAvailable?) random-weight)
+  let weightList (list (enemy-vision-weight * enemyVisionAvailable?) (grouping-weight * groupingAvailable?) random-weight)
   let randomNumber random (sum weightList)
   let selectedTurningStrategyIndex 0
   
@@ -232,8 +231,8 @@ to-report selectTurningStrategy
   
   let counter 1
   while [selectedTurningStrategyIndex = 0] [
-    if (counter > 4) [
-      show (word "steering selection cycle counter overrun; random number: " randomNumber " list: " weightList)
+    if (counter > 3) [
+      show (word "turning selection cycle counter overrun; random number: " randomNumber " list: " weightList)
     ]
     let weightSum sum (sublist weightList 0 counter)
     show (word "in while " counter " sum " weightSum " random number " randomNumber " sublist " (sublist weightList 0 counter))
@@ -249,20 +248,6 @@ end
 ;; it returns true if there is no solder in radius "person-radius"
 to-report validateCurrentPosition
   report not any? other turtles in-radius person-radius
-end
-
-;; it returns boolean encoded as int (0~false 1~true)
-to-report smellFightAvailable?
-  ;;show word "smellFightAvailable " (any? enemiesInFightingRadius)
-  report ifelse-value (any? fightingEnemiesInSmellingRadius) [1] [0]
-end
-
-;; return true if position was set; false otherwise
-to setPositionByFight
-    let nearestEnemy min-one-of fightingEnemiesInSmellingRadius [distance myself]
-    face nearestEnemy
-    applyHeadingDeviation
-    forward stepLength
 end
 
 ;; it returns boolean encoded as int (0~false 1~true)
@@ -357,7 +342,7 @@ to-report neighbourFootprintedPatches
   if not any? other turtles in-cone (stepLength + 2) 80 with [breed = [breed] of myself] [
     report no-patches
   ]
-  let sniffThreshold 0.4
+  let sniffThreshold 0.2
   let footprintedPatchesAhead patches in-cone stepLength 80 with [footprint > sniffThreshold]
   let currentPxcor [pxcor] of patch-here
   let currentPycor [pycor] of patch-here
@@ -371,18 +356,6 @@ end
 
 to-report enemiesInFightingRadius
    report turtles in-radius fight-radius with [breed != [breed] of myself]
-end
-
-to-report fightingEnemiesInSmellingRadius
-   report turtles in-radius getSmellFightRadiusByBreed with [breed != [breed] of myself and is-fighting = true]
-end
-
-to-report getSmellFightRadiusByBreed
-  ifelse breed = redarmy [
-      report smell-fight-radius-red
-    ] [
-      report smell-fight-radius-blue
-    ]
 end
 
 to drawChessboard 
@@ -403,10 +376,10 @@ end
 GRAPHICS-WINDOW
 217
 10
-656
-470
-16
-16
+760
+574
+20
+20
 13.0
 1
 10
@@ -417,10 +390,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--16
-16
--16
-16
+-20
+20
+-20
+20
 0
 0
 1
@@ -506,7 +479,7 @@ army-population
 army-population
 0
 400
-56
+36
 1
 1
 NIL
@@ -611,7 +584,7 @@ CHOOSER
 red_position
 red_position
 "corner" "side" "random"
-1
+0
 
 CHOOSER
 988
@@ -709,21 +682,6 @@ view-radius
 NIL
 HORIZONTAL
 
-SLIDER
-8
-290
-207
-323
-smell-fight-weight
-smell-fight-weight
-0
-100
-100
-1
-1
-%
-HORIZONTAL
-
 TEXTBOX
 10
 271
@@ -743,7 +701,7 @@ enemy-vision-weight
 enemy-vision-weight
 0
 100
-0
+50
 1
 1
 %
@@ -809,6 +767,21 @@ Statistics
 11
 0.0
 1
+
+SLIDER
+9
+289
+206
+322
+decreaseFootprint
+decreaseFootprint
+0
+1.0
+0.9
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
