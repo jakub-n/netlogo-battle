@@ -269,10 +269,24 @@ to-report groupingAvailable?
 end
 
 to setPositionByFootprints
-  let footprintedPatches neighbourFootprintedPatches
-  let mostFootprintedPatch max-one-of footprintedPatches [footprint]
-  facexy ([pxcor] of mostFootprintedPatch) ([pycor] of mostFootprintedPatch)
+  let relevantFellows neighbourFootprintedPatches
+  
+  let headingSum 0
+  let headingCount count relevantFellows
+  ask relevantFellows [
+    set headingSum (sumAngle headingSum heading)
+  ]
+  let averageHeading headingSum / headingCount
+  let newHeading (sumAngle ((1 - grouping-factor) * heading) (grouping-factor * averageHeading))
+  set heading newHeading
   forward stepLength
+end
+
+to-report sumAngle [a b] 
+  let extA a + 360
+  let extB b + 360
+  let aPlusB extA + extB - 720
+  report aPlusB
 end
 
 to setPositionRandomly 
@@ -339,15 +353,8 @@ to-report done?
 end
 
 to-report neighbourFootprintedPatches
-  if not any? other turtles in-cone (stepLength + 2) 80 with [breed = [breed] of myself] [
-    report no-patches
-  ]
-  let sniffThreshold 0.2
-  let footprintedPatchesAhead patches in-cone stepLength 80 with [footprint > sniffThreshold]
-  let currentPxcor [pxcor] of patch-here
-  let currentPycor [pycor] of patch-here
-  let results footprintedPatchesAhead with [(pxcor != currentPxcor) or (pycor != currentPycor)]
-  report results
+  let relevantFellows other turtles in-cone (stepLength + 3) 180 with [breed = [breed] of myself]
+  report relevantFellows
 end
 
 to-report visibleEnemies 
@@ -701,7 +708,7 @@ enemy-vision-weight
 enemy-vision-weight
 0
 100
-50
+31
 1
 1
 %
@@ -744,7 +751,7 @@ SWITCH
 423
 show-footprints?
 show-footprints?
-0
+1
 1
 -1000
 
@@ -778,6 +785,21 @@ decreaseFootprint
 0
 1.0
 0.9
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1009
+515
+1181
+548
+grouping-factor
+grouping-factor
+0
+1
+0.7
 0.1
 1
 NIL
