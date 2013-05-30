@@ -496,8 +496,8 @@ SLIDER
 army-population
 army-population
 0
-100
-44
+400
+244
 1
 1
 NIL
@@ -510,10 +510,10 @@ SLIDER
 141
 fight-radius
 fight-radius
-0.1
-5
-1.5
-0.1
+1.0
+3
+1.2
+0.2
 1
 NIL
 HORIZONTAL
@@ -527,7 +527,7 @@ smell-fight-radius-red
 smell-fight-radius-red
 0
 10
-8
+5
 1
 1
 NIL
@@ -694,7 +694,7 @@ person-radius
 person-radius
 0
 1
-1
+0.4
 0.1
 1
 NIL
@@ -724,7 +724,7 @@ smell-fight-weight
 smell-fight-weight
 0
 100
-0
+40
 1
 1
 %
@@ -749,7 +749,7 @@ enemy-vision-weight
 enemy-vision-weight
 0
 100
-0
+40
 1
 1
 %
@@ -764,7 +764,7 @@ grouping-weight
 grouping-weight
 0
 100
-100
+0
 1
 1
 %
@@ -779,7 +779,7 @@ random-weight
 random-weight
 1
 100
-1
+20
 1
 1
 %
@@ -805,7 +805,7 @@ smell-fight-radius-blue
 smell-fight-radius-blue
 0
 10
-9
+5
 1
 1
 NIL
