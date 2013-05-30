@@ -8,9 +8,6 @@ globals [
   armydistance
   ]
 
-
-
-
 turtles-own[
   is-fighting
   ]
@@ -179,6 +176,7 @@ to move
   let originalXPosition xcor
   let originalYPosition ycor
   let originalDirection heading
+  let originalPatch patch-here
   
   let counter 0
   let positionFound? false
@@ -198,6 +196,11 @@ to move
     show (word "Turtle " who " could not find proper position.")
   ] [
     enlargeFootprint
+  ]
+  
+  if patch-here = originalPatch [
+    rt 180
+    applyHeadingDeviation
   ]
 end
 
@@ -350,10 +353,16 @@ to-report done?
   report false
 end
 
-to-report neighbourFootprintedPatches 
+to-report neighbourFootprintedPatches
+  if not any? other turtles in-cone (stepLength + 2) 80 with [breed = [breed] of myself] [
+    report no-patches
+  ]
   let sniffThreshold 0.4
   let footprintedPatchesAhead patches in-cone stepLength 80 with [footprint > sniffThreshold]
-  report footprintedPatchesAhead
+  let currentPxcor [pxcor] of patch-here
+  let currentPycor [pycor] of patch-here
+  let results footprintedPatchesAhead with [(pxcor != currentPxcor) or (pycor != currentPycor)]
+  report results
 end
 
 to-report visibleEnemies 
@@ -394,10 +403,10 @@ end
 GRAPHICS-WINDOW
 217
 10
-760
-574
-20
-20
+656
+470
+16
+16
 13.0
 1
 10
@@ -408,10 +417,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--20
-20
--20
-20
+-16
+16
+-16
+16
 0
 0
 1
@@ -497,7 +506,7 @@ army-population
 army-population
 0
 400
-244
+56
 1
 1
 NIL
@@ -514,21 +523,6 @@ fight-radius
 3
 1.2
 0.2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-781
-317
-935
-350
-smell-fight-radius-red
-smell-fight-radius-red
-0
-10
-5
-1
 1
 NIL
 HORIZONTAL
@@ -616,8 +610,8 @@ CHOOSER
 312
 red_position
 red_position
-"corner" "side"
-0
+"corner" "side" "random"
+1
 
 CHOOSER
 988
@@ -626,8 +620,8 @@ CHOOSER
 312
 blue_position
 blue_position
-"side" "corner"
-1
+"corner" "side" "random"
+0
 
 INPUTBOX
 782
@@ -724,7 +718,7 @@ smell-fight-weight
 smell-fight-weight
 0
 100
-40
+100
 1
 1
 %
@@ -749,7 +743,7 @@ enemy-vision-weight
 enemy-vision-weight
 0
 100
-40
+0
 1
 1
 %
@@ -764,7 +758,7 @@ grouping-weight
 grouping-weight
 0
 100
-0
+100
 1
 1
 %
@@ -779,7 +773,7 @@ random-weight
 random-weight
 1
 100
-20
+1
 1
 1
 %
@@ -795,21 +789,6 @@ show-footprints?
 0
 1
 -1000
-
-SLIDER
-989
-318
-1143
-351
-smell-fight-radius-blue
-smell-fight-radius-blue
-0
-10
-5
-1
-1
-NIL
-HORIZONTAL
 
 TEXTBOX
 992
