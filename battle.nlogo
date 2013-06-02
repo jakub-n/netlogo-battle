@@ -631,10 +631,10 @@ blue_position
 0
 
 INPUTBOX
-1222
-57
-1320
-117
+997
+384
+1095
+444
 background_color
 51
 1
@@ -642,10 +642,10 @@ background_color
 Color
 
 SLIDER
-1326
-57
-1425
-90
+1101
+384
+1200
+417
 turtle-icon-size
 turtle-icon-size
 1
@@ -657,11 +657,11 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-1223
-32
-1373
-50
-visual settings
+998
+359
+1148
+377
+Visual settings
 11
 0.0
 0
